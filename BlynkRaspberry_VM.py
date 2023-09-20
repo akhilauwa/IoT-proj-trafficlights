@@ -12,6 +12,7 @@
 
 import blynklib
 import random
+import time
 # import RPi.GPIO as GPIO
 
 BLYNK_AUTH_TOKEN = "Bm7q73fxUgn88ztlTApzlL1ReDDSK68j"
@@ -47,6 +48,7 @@ def v0_write_handler(pin, value):
         # Turn off LED1
         print("LED1 Off")
 
+
 # Register virtual pin handler for V1
 @blynk.handle_event("write V1")
 def v1_write_handler(pin, value):
@@ -66,14 +68,23 @@ def v2_read_handler(pin):
     blynk.virtual_write(pin, random.randint(0, 5000))
     
 
-@blynk.handle_event("connected")
-def blynk_connected(ping):
-    print('Blynk ready. Ping:', ping, 'ms')
-    # You can also use blynk.sync_virtual(pin)
+CONNECT_PRINT_MSG = '[CONNECT_EVENT]'
+DISCONNECT_PRINT_MSG = '[DISCONNECT_EVENT]'
 
-@blynk.handle_event("disconnected")
-def blynk_disconnected():
-    print('Blynk disconnected')
+
+@blynk.handle_event("connect")
+def connect_handler():
+    print(CONNECT_PRINT_MSG)
+    print('Sleeping 2 sec in connect handler...')
+    time.sleep(2)
+    blynk.disconnect()
+
+
+@blynk.handle_event("disconnect")
+def disconnect_handler():
+    print(DISCONNECT_PRINT_MSG)
+    print('Sleeping 4 sec in disconnect handler...')
+    time.sleep(4)
 
 
 while True:
