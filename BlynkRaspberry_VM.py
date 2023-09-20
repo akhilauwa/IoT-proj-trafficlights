@@ -11,8 +11,8 @@
 
 
 import blynklib
-import time
-import RPi.GPIO as GPIO
+import random
+# import RPi.GPIO as GPIO
 
 BLYNK_AUTH_TOKEN = "Bm7q73fxUgn88ztlTApzlL1ReDDSK68j"
 
@@ -31,54 +31,61 @@ pot_virt_pin = 2
 
 term_virt_pin = 3
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(22, GPIO.OUT)
-GPIO.setup(23, GPIO.OUT)
-GPIO.setup(pot_pin, GPIO.IN)
+potvalue = 0
 
-# TODO FIX PIN NAMES
+WRITE_EVENT_PRINT_MSG = "[WRITE_VIRTUAL_PIN_EVENT] Pin: V{} Value: '{}'"
+READ_PRINT_MSG = "[READ_VIRTUAL_PIN_EVENT] Pin: V{}"
+
 # Register virtual pin handler for V0
-@blynk.on("writeV0")
+@blynk.handle_event("write V0")
 def v0_write_handler(pin, value):
-    if int(value[0]) == 1:
+    print(WRITE_EVENT_PRINT_MSG.format(pin, value))
+    if value == 1:
         # Turn on LED1
-        GPIO.output(22, GPIO.HIGH)
+        print("LED1 On")
     else:
         # Turn off LED1
-        GPIO.output(22, GPIO.LOW)
+        print("LED1 Off")
 
 # Register virtual pin handler for V1
-@blynk.on("writeV1")
+@blynk.handle_event("write V1")
 def v1_write_handler(pin, value):
-    if int(value[0]) == 1:
+    print(WRITE_EVENT_PRINT_MSG.format(pin, value))
+    if value == 1:
         # Turn on LED2
-        GPIO.output(23, GPIO.HIGH)
+        print("LED2 On")
     else:
         # Turn off LED2
-        GPIO.output(23, GPIO.LOW)
+        print("LED2 Off")
 
-@blynk.on("connected")
+
+@blynk.handle_event("read V2")
+def v2_read_handler(pin):
+    print(READ_PRINT_MSG.format(pin))
+    # blynk.virtual_write(pin, potvalue)
+    blynk.virtual_write(pin, random.randint(0, 5000))
+    
+
+@blynk.handle_event("connected")
 def blynk_connected(ping):
     print('Blynk ready. Ping:', ping, 'ms')
     # You can also use blynk.sync_virtual(pin)
 
-@blynk.on("disconnected")
+@blynk.handle_event("disconnected")
 def blynk_disconnected():
     print('Blynk disconnected')
 
+
 while True:
-    try:
-        potvalue = GPIO.input(pot_pin)
-        print("pot =", potvalue)
-        blynk.virtual_write(pot_virt_pin, potvalue)
-
-        terminalStr = "pot = {}".format(potvalue)
-        print(terminalStr)
-        blynk.virtual_write(term_virt_pin, terminalStr)
-
-        time.sleep(1)
+    try: 
+        potvalue += 1
+        if potvalue > 4900:
+            potvalue = 0
+        print("pot = ", potvalue)
+        # blynk.virtual_write(pot_virt_pin, potvalue)
+        # time.sleep(1)
 
         blynk.run()
     except KeyboardInterrupt:
-        GPIO.cleanup()
+        # GPIO.cleanup()
         break
