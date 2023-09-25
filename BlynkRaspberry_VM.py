@@ -1,3 +1,8 @@
+"""
+Runs on Raspberry Pi Desktop for Windows in a VM
+Written by: Akhila Liyanage
+"""
+
 # pip install blynk-library-python
 
 import BlynkLib
