@@ -2,86 +2,80 @@
 
 import BlynkLib
 import random
-import time
 # import RPi.GPIO as GPIO
 
 # Initialize Blynk
 blynk = BlynkLib.Blynk('jw1NZLXq38HoD_0YzrBQ2xcAIPY59nip')
 
 # Set up GPIO pins
-led1_pin = 17
-led1_virt_pin = 0
+# Define LED pin configurations for grouped LEDs
+GREEN_NS = 22
+GREEN_EW = 25
+YELLOW_NS = 27
+YELLOW_EW = 24
+RED_NS = 17
+RED_EW = 23
 
-led2_pin = 23
-led2_virt_pin = 1
+ALL_LEDS = [GREEN_NS, GREEN_EW, YELLOW_NS, YELLOW_EW, RED_NS, RED_EW]
 
-pot_pin = 34
-pot_virt_pin = 2
+cars_count = 0
+cars_virt_pin = 2
 
 term_virt_pin = 3
 
-potvalue = 0
+emergency_activated = False
 
 # GPIO.setmode(GPIO.BCM)
 # GPIO.setup(17, GPIO.OUT)
 # GPIO.setup(23, GPIO.OUT)
 
-# Register Virtual Pins
-@blynk.VIRTUAL_WRITE(0)
-def my_write_handler(value):
-    print('Current V0 value: ')
-    print(value)
+# Emergency Vehicle Override
+@blynk.ON('V0')
+def v0_write_handler(value):
     if value == ['1']:
-        # Turn on LED1
-        # GPIO.output(led1_pin, GPIO.HIGH)
-        print("LED1 On")
+        # TODO change traffic_light_sequence to read emergency flag
+        emergency_activated = True
+        blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Activated\n')
+        print('Emergency Vehicle Override Activated')
     else:
-        # Turn off LED1
-        # GPIO.output(led1_pin, GPIO.LOW)
-        print("LED1 Off")
+        # TODO change traffic_light_sequence to read emergency flag
+        emergency_activated = False
+        blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Deactivated\n')
+        print('Emergency Vehicle Override Deactivated')
+        print('Resuming Normal Sequence')
 
-# Register Virtual Pins
-@blynk.VIRTUAL_WRITE(1)
-def my_write_handler(value):
-    print('Current V1 value: ')
-    print(value)
-    if value == ['1']:
-        # Turn on LED1
-        # GPIO.output(led2_pin, GPIO.HIGH)
-        print("LED2 On")
-    else:
-        # Turn off LED1
-        # GPIO.output(led2_pin, GPIO.LOW)
-        print("LED2 Off")
+# TODO remove:
+# @blynk.VIRTUAL_READ(2)
+# def v2_read_handler(potvalue):
+#     blynk.virtual_write(pot_virt_pin, potvalue)
 
-@blynk.VIRTUAL_READ(2)
-def my_read_handler():
-    # this widget will show some time in seconds..
-    blynk.virtual_write(pot_virt_pin, random.randint(0, 5000))
-
-@blynk.on("V3")
+# Terminal - execute the python command and echo it back
+@blynk.ON('V3')
 def v3_write_handler(value):
-    # execute the command echo it back
+    value = value[0]
     blynk.virtual_write(term_virt_pin, 'Command: ' + value + '\n')
     blynk.virtual_write(term_virt_pin, 'Result: ')
     try:
         blynk.virtual_write(term_virt_pin, str(eval(value)))
+        print(str(eval(value)))
     except:
         try:
             exec(value)
         except Exception as e:
             blynk.virtual_write(term_virt_pin, 'Exception:\n  ' + repr(e))
+            print('Exception:\n  ' + repr(e))
     finally:
         blynk.virtual_write(term_virt_pin, '\n')
 
+
+def get_NS_car_count():
+    return random.randint(0, 100)
+
 while True:
     try:
-        potvalue += 1
-        if potvalue > 4900:
-            potvalue = 0
-        # print("pot = ", potvalue)
-        blynk.virtual_write(pot_virt_pin, potvalue)
-
+        cars_count = get_NS_car_count()
+        # Send car count to Blynk
+        blynk.virtual_write(cars_virt_pin, cars_count)
         blynk.run()
     except KeyboardInterrupt:
         # GPIO.cleanup()
