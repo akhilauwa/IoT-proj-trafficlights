@@ -57,15 +57,31 @@ def my_write_handler(value):
 @blynk.VIRTUAL_READ(2)
 def my_read_handler():
     # this widget will show some time in seconds..
-    blynk.virtual_write(2, random.randint(0, 5000))
+    blynk.virtual_write(pot_virt_pin, random.randint(0, 5000))
+
+@blynk.on("V3")
+def v3_write_handler(value):
+    # execute the command echo it back
+    blynk.virtual_write(term_virt_pin, 'Command: ' + value + '\n')
+    blynk.virtual_write(term_virt_pin, 'Result: ')
+    try:
+        blynk.virtual_write(term_virt_pin, str(eval(value)))
+    except:
+        try:
+            exec(value)
+        except Exception as e:
+            blynk.virtual_write(term_virt_pin, 'Exception:\n  ' + repr(e))
+    finally:
+        blynk.virtual_write(term_virt_pin, '\n')
 
 while True:
     try:
         potvalue += 1
         if potvalue > 4900:
             potvalue = 0
-#         print("pot = ", potvalue)
-        # blynk.virtual_write(pot_virt_pin, potvalue)
+        # print("pot = ", potvalue)
+        blynk.virtual_write(pot_virt_pin, potvalue)
+
         blynk.run()
     except KeyboardInterrupt:
         # GPIO.cleanup()
