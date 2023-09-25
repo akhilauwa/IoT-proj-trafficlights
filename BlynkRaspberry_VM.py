@@ -8,7 +8,6 @@ import random
 # Initialize Blynk
 blynk = BlynkLib.Blynk('jw1NZLXq38HoD_0YzrBQ2xcAIPY59nip')
 
-# Set up GPIO pins
 # Define LED pin configurations for grouped LEDs
 GREEN_NS = 22
 GREEN_EW = 25
@@ -22,9 +21,7 @@ ALL_LEDS = [GREEN_NS, GREEN_EW, YELLOW_NS, YELLOW_EW, RED_NS, RED_EW]
 cars_count = 0
 cars_virt_pin = 2
 send_interval = 3
-
 term_virt_pin = 3
-
 emergency_activated = False
 
 # GPIO.setmode(GPIO.BCM)
@@ -32,19 +29,18 @@ emergency_activated = False
 # GPIO.setup(23, GPIO.OUT)
 
 # Emergency Vehicle Override
+# TODO change traffic_light_sequence to read emergency flag
 @blynk.ON('V0')
 def v0_write_handler(value):
+    global emergency_activated
     if value == ['1']:
-        # TODO change traffic_light_sequence to read emergency flag
         emergency_activated = True
-        blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Activated\n')
-        print('Emergency Vehicle Override Activated')
+        message = 'Emergency Vehicle Override Activated\n'
     else:
-        # TODO change traffic_light_sequence to read emergency flag
         emergency_activated = False
-        blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Deactivated\n')
-        print('Emergency Vehicle Override Deactivated')
-        print('Resuming Normal Sequence')
+        message = 'Emergency Vehicle Override Deactivated\nResuming Normal Sequence\n'
+    blynk.virtual_write(term_virt_pin, message)
+    print(message)
 
 # TODO remove:
 # @blynk.VIRTUAL_READ(2)
@@ -73,6 +69,7 @@ def get_NS_car_count():
 
 # Send car count to Blynk
 def send_NS_car_count():
+    global cars_count
     cars_count = get_NS_car_count()
     blynk.virtual_write(cars_virt_pin, cars_count)
 
