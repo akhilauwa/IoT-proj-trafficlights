@@ -1,6 +1,7 @@
 # pip install blynk-library-python
 
 import BlynkLib
+from BlynkTimer import BlynkTimer
 import random
 # import RPi.GPIO as GPIO
 
@@ -20,6 +21,7 @@ ALL_LEDS = [GREEN_NS, GREEN_EW, YELLOW_NS, YELLOW_EW, RED_NS, RED_EW]
 
 cars_count = 0
 cars_virt_pin = 2
+send_interval = 3
 
 term_virt_pin = 3
 
@@ -54,29 +56,36 @@ def v0_write_handler(value):
 def v3_write_handler(value):
     value = value[0]
     blynk.virtual_write(term_virt_pin, 'Command: ' + value + '\n')
-    blynk.virtual_write(term_virt_pin, 'Result: ')
     try:
-        blynk.virtual_write(term_virt_pin, str(eval(value)))
-        print(str(eval(value)))
-    except:
-        try:
-            exec(value)
-        except Exception as e:
-            blynk.virtual_write(term_virt_pin, 'Exception:\n  ' + repr(e))
-            print('Exception:\n  ' + repr(e))
+        result = str(eval(value))
+        blynk.virtual_write(term_virt_pin, 'Result:\n  ')
+        blynk.virtual_write(term_virt_pin, result)
+        print('Result:', result)
+    except Exception as e:
+        blynk.virtual_write(term_virt_pin, 'Exception:\n  ' + repr(e))
+        print('Exception:\n  ' + repr(e))
     finally:
         blynk.virtual_write(term_virt_pin, '\n')
 
-
+# Get car count using YOLO
 def get_NS_car_count():
     return random.randint(0, 100)
 
+# Send car count to Blynk
+def send_NS_car_count():
+    cars_count = get_NS_car_count()
+    blynk.virtual_write(cars_virt_pin, cars_count)
+
+# Create BlynkTimer Instance
+timer = BlynkTimer()
+
+# Add Timers
+timer.set_interval(send_interval, send_NS_car_count)
+
 while True:
     try:
-        cars_count = get_NS_car_count()
-        # Send car count to Blynk
-        blynk.virtual_write(cars_virt_pin, cars_count)
         blynk.run()
+        timer.run()
     except KeyboardInterrupt:
         # GPIO.cleanup()
         break
