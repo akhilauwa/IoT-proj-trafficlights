@@ -1,3 +1,5 @@
+# pip install blynk-library-python
+
 import BlynkLib
 import random
 import time
