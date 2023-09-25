@@ -15,13 +15,14 @@ import random
 import time
 # import RPi.GPIO as GPIO
 
-BLYNK_AUTH_TOKEN = "Bm7q73fxUgn88ztlTApzlL1ReDDSK68j"
+# BLYNK_AUTH_TOKEN = "Bm7q73fxUgn88ztlTApzlL1ReDDSK68j"
+BLYNK_AUTH_TOKEN = "jw1NZLXq38HoD_0YzrBQ2xcAIPY59nip"
 
 # Initialize Blynk
 blynk = blynklib.Blynk(BLYNK_AUTH_TOKEN)
 
 # Set up GPIO pins
-led1_pin = 22
+led1_pin = 17
 led1_virt_pin = 0
 
 led2_pin = 23
@@ -43,9 +44,11 @@ def v0_write_handler(pin, value):
     print(WRITE_EVENT_PRINT_MSG.format(pin, value))
     if value == 1:
         # Turn on LED1
+        GPIO.output(led1_pin, GPIO.HIGH)
         print("LED1 On")
     else:
         # Turn off LED1
+        GPIO.output(led1_pin, GPIO.LOW)
         print("LED1 Off")
 
 
@@ -55,9 +58,11 @@ def v1_write_handler(pin, value):
     print(WRITE_EVENT_PRINT_MSG.format(pin, value))
     if value == 1:
         # Turn on LED2
+        GPIO.output(led2_pin, GPIO.HIGH)
         print("LED2 On")
     else:
         # Turn off LED2
+        GPIO.output(led2_pin, GPIO.LOW)
         print("LED2 Off")
 
 
@@ -89,14 +94,14 @@ def disconnect_handler():
 
 while True:
     try: 
-        potvalue += 1
-        if potvalue > 4900:
-            potvalue = 0
-        print("pot = ", potvalue)
+#         potvalue += 1
+#         if potvalue > 4900:
+#             potvalue = 0
+#         print("pot = ", potvalue)
         # blynk.virtual_write(pot_virt_pin, potvalue)
         # time.sleep(1)
 
         blynk.run()
     except KeyboardInterrupt:
-        # GPIO.cleanup()
+        GPIO.cleanup()
         break

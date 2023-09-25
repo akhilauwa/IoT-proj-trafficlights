@@ -16,11 +16,11 @@ import RPi.GPIO as GPIO
 
 BLYNK_AUTH_TOKEN = "Bm7q73fxUgn88ztlTApzlL1ReDDSK68j"
 
-# Initialize Blynk
+# Initialize Blynk 
 blynk = blynklib.Blynk(BLYNK_AUTH_TOKEN)
 
 # Set up GPIO pins
-led1_pin = 22
+led1_pin = 17
 led1_virt_pin = 0
 
 led2_pin = 23
@@ -42,20 +42,20 @@ GPIO.setup(pot_pin, GPIO.IN)
 def v0_write_handler(pin, value):
     if int(value[0]) == 1:
         # Turn on LED1
-        GPIO.output(22, GPIO.HIGH)
+        GPIO.output(led1_pin, GPIO.HIGH)
     else:
         # Turn off LED1
-        GPIO.output(22, GPIO.LOW)
+        GPIO.output(led1_pin, GPIO.LOW)
 
 # Register virtual pin handler for V1
 @blynk.on("writeV1")
 def v1_write_handler(pin, value):
     if int(value[0]) == 1:
         # Turn on LED2
-        GPIO.output(23, GPIO.HIGH)
+        GPIO.output(led2_pin, GPIO.HIGH)
     else:
         # Turn off LED2
-        GPIO.output(23, GPIO.LOW)
+        GPIO.output(led2_pin, GPIO.LOW)
 
 @blynk.on("connected")
 def blynk_connected(ping):
