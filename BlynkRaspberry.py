@@ -36,6 +36,7 @@ emergency_activated = False
 # GPIO.setup(17, GPIO.OUT)
 # GPIO.setup(23, GPIO.OUT)
 
+
 # Emergency Vehicle Override
 @blynk.ON('V0')
 def v0_write_handler(value):

@@ -3,8 +3,8 @@ import RPi.GPIO as GPIO
 import random 
 
 MIN_GREEN_TIME_NS = 6  # Minimum green light time in seconds for North & South
-TIME_PER_CAR = 6       # Additional green light time in seconds per car
-MIN_GREEN_TIME_EW = 6  # Fixed green light time in seconds for East & West
+TIME_PER_CAR = 60       # Additional green light time in seconds per car
+MIN_GREEN_TIME_EW = 60  # Fixed green light time in seconds for East & West
 ALL_RED_TRANSITION = 3  # All Red light duration for transitions
 
 # Define LED pin configurations for grouped LEDs
