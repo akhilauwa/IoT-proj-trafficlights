@@ -50,6 +50,7 @@ for pin in ALL_LEDS:
 # Emergency Vehicle Override
 @blynk.ON('V0')
 def v0_write_handler(value):
+    global emergency_activated
     if value == ['1']:
         # TODO change traffic_light_sequence to read emergency flag
         emergency_activated = True
@@ -85,7 +86,7 @@ def v3_write_handler(value):
 
 # Get car count using YOLO
 def get_NS_car_count():
-    return random.randint(0, 100)
+    return random.randint(0, 2)
 
 # Send car count to Blynk
 def send_NS_car_count():
@@ -102,11 +103,21 @@ def send_NS_car_count():
 def turn_off_all_lights():
     for pin in ALL_LEDS:
         GPIO.output(pin, False)
+
+def safe_sleep(seconds):
+    end_time = time.time() + seconds
+    while time.time() < end_time:
+        if emergency_activated:
+            break
+        time.sleep(0.1)
         
 def traffic_light_logic():
     global emergency_activated
+    emergency_msg = True
+
     while True:
         if not emergency_activated:
+            emergency_msg = True
             car_count = get_NS_car_count()
             green_time_ns = MIN_GREEN_TIME_NS + car_count * TIME_PER_CAR
             
@@ -115,41 +126,53 @@ def traffic_light_logic():
             GPIO.output(GREEN_NS, True)
             GPIO.output(RED_EW, True)
             print(f"North & South Green light for {green_time_ns} seconds.")
-            time.sleep(green_time_ns)
+            # time.sleep(green_time_ns)
+            safe_sleep(green_time_ns)
 
             # North & South Yellow, East & West Red
             GPIO.output(GREEN_NS, False)
             GPIO.output(YELLOW_NS, True)
             print("North & South Yellow light for 10 seconds.")
-            time.sleep(10)
+            # time.sleep(10)
+            safe_sleep(10)
             
             # All Red for transition
             GPIO.output(YELLOW_NS, False)
             GPIO.output(RED_NS, True)
             GPIO.output(RED_EW, True)
             print(f"All Red light for {ALL_RED_TRANSITION} seconds.")
-            time.sleep(ALL_RED_TRANSITION)
+            # time.sleep(ALL_RED_TRANSITION)
+            safe_sleep(ALL_RED_TRANSITION)
 
             # East & West Green, North & South Red
             GPIO.output(RED_EW, False)
             GPIO.output(GREEN_EW, True)
             print(f"East & West Green light for {MIN_GREEN_TIME_EW} seconds.")
-            time.sleep(MIN_GREEN_TIME_EW)
+            # time.sleep(MIN_GREEN_TIME_EW)
+            safe_sleep(MIN_GREEN_TIME_EW)
 
             # East & West Yellow, North & South Red
             GPIO.output(GREEN_EW, False)
             GPIO.output(YELLOW_EW, True)
             print("East & West Yellow light for 10 seconds.")
-            time.sleep(10)
+            # time.sleep(10)
+            safe_sleep(10)
 
             # All Red for transition
             GPIO.output(YELLOW_EW, False)
             GPIO.output(RED_NS, True)
             GPIO.output(RED_EW, True)
             print(f"All Red light for {ALL_RED_TRANSITION} seconds.")
-            time.sleep(ALL_RED_TRANSITION)
+            # time.sleep(ALL_RED_TRANSITION)
+            safe_sleep(ALL_RED_TRANSITION)
         else:
-            time.sleep(1) # Just in case
+            GPIO.output(GREEN_NS, True)
+            GPIO.output(RED_EW, True)
+            GPIO.output(GREEN_EW, False)
+            GPIO.output(RED_NS, False)
+            if emergency_msg:
+                print(f"Emergency.") # Just in case
+                emergency_msg = False
             
 # start the timer
 send_NS_car_count()
