@@ -2,8 +2,8 @@ import socket
 
 server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
 server.bind(("b8:08:cf:f1:1a:d9", 4))
-
 server.listen(1)
+
 client, address = server.accept()
 
 try:
