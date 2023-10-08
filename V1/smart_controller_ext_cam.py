@@ -28,8 +28,8 @@ YELLOW_EW = 24
 RED_NS = 17
 RED_EW = 23
 
-MIN_GREEN_TIME_NS = 6  # Minimum green light time in seconds for North & South
-TIME_PER_CAR = 6       # Additional green light time in seconds per car
+MIN_GREEN_TIME_NS = 10  # Minimum green light time in seconds for North & South
+TIME_PER_CAR = 3       # Additional green light time in seconds per car
 MIN_GREEN_TIME_EW = 6  # Fixed green light time in seconds for East & West
 ALL_RED_TRANSITION = 3  # All Red light duration for transitions
 
@@ -108,12 +108,11 @@ def safe_sleep(seconds):
 def traffic_light_logic():
     global emergency_activated
     emergency_msg = True
+    car_count = 0
 
     while True:
         if not emergency_activated:
             emergency_msg = True
-            car_count = get_NS_car_count(10)    # NOTE change parameter here to change duration of car count (seconds)
-            send_NS_car_count(car_count)
             green_time_ns = MIN_GREEN_TIME_NS + car_count * TIME_PER_CAR
             
             # North & South Green, East & West Red
@@ -121,8 +120,12 @@ def traffic_light_logic():
             GPIO.output(GREEN_NS, True)
             GPIO.output(RED_EW, True)
             print(f"North & South Green light for {green_time_ns} seconds.")
+
+            # NOTE calling get_NS_car_count(duration) here will cause the program to wait for the car count to finish
+            car_count = get_NS_car_count(green_time_ns)
+            send_NS_car_count(car_count)
             # time.sleep(green_time_ns)
-            safe_sleep(green_time_ns)
+            # safe_sleep(green_time_ns)
 
             # North & South Yellow, East & West Red
             GPIO.output(GREEN_NS, False)
