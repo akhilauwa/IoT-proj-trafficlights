@@ -86,6 +86,7 @@ def get_NS_car_count(duration=20):
         client_socket.close()
         print("Client socket closed.")
     except KeyboardInterrupt:
+        print("KeyboardInterrupt registered...")
         print("Closing client socket...")
         client_socket.close()
         print("Client socket closed.")
@@ -108,11 +109,13 @@ def safe_sleep(seconds):
     end_time = time.time() + seconds
     try:
         while time.time() < end_time:
+            blynk.run()
             if emergency_activated:
                 break
             time.sleep(0.1)
     except KeyboardInterrupt:
-        print("Exiting sleep")
+        print("KeyboardInterrupt registered...")
+        print("Exiting safe sleep")
 
 # Traffic light logic (main)       
 def traffic_light_logic():
@@ -120,84 +123,87 @@ def traffic_light_logic():
     emergency_msg = True
     car_count = 0
 
-    try:
-        while True:
-            if not emergency_activated:
-                emergency_msg = True
-                green_time_ns = MIN_GREEN_TIME_NS + car_count * TIME_PER_CAR
-                
-                # North & South Green, East & West Red
-                turn_off_all_lights()
-                GPIO.output(GREEN_NS, True)
-                GPIO.output(RED_EW, True)
-                print(f"North & South Green light for {green_time_ns} seconds.")
+    while True:
+        if not emergency_activated:
+            emergency_msg = True
+            green_time_ns = MIN_GREEN_TIME_NS + car_count * TIME_PER_CAR
+            
+            # North & South Green, East & West Red
+            turn_off_all_lights()
+            GPIO.output(GREEN_NS, True)
+            GPIO.output(RED_EW, True)
+            print(f"North & South Green light for {green_time_ns} seconds.")
 
-                # NOTE calling get_NS_car_count(duration) here will cause the program to wait for the car count to finish
-                car_count = get_NS_car_count(green_time_ns)
-                send_NS_car_count(car_count)
-                # time.sleep(green_time_ns)
-                # safe_sleep(green_time_ns)
+            # NOTE calling get_NS_car_count(duration) here will cause the program to wait for the car count to finish
+            car_count = get_NS_car_count(green_time_ns)
+            send_NS_car_count(car_count)
+            # time.sleep(green_time_ns)
+            # safe_sleep(green_time_ns)
 
-                # North & South Yellow, East & West Red
-                GPIO.output(GREEN_NS, False)
-                GPIO.output(YELLOW_NS, True)
-                print("North & South Yellow light for 10 seconds.")
-                # time.sleep(10)
-                safe_sleep(10)
-                
-                # All Red for transition
-                GPIO.output(YELLOW_NS, False)
-                GPIO.output(RED_NS, True)
-                GPIO.output(RED_EW, True)
-                print(f"All Red light for {ALL_RED_TRANSITION} seconds.")
-                # time.sleep(ALL_RED_TRANSITION)
-                safe_sleep(ALL_RED_TRANSITION)
+            # North & South Yellow, East & West Red
+            GPIO.output(GREEN_NS, False)
+            GPIO.output(YELLOW_NS, True)
+            print("North & South Yellow light for 10 seconds.")
+            # time.sleep(10)
+            safe_sleep(10)
+            
+            # All Red for transition
+            GPIO.output(YELLOW_NS, False)
+            GPIO.output(RED_NS, True)
+            GPIO.output(RED_EW, True)
+            print(f"All Red light for {ALL_RED_TRANSITION} seconds.")
+            # time.sleep(ALL_RED_TRANSITION)
+            safe_sleep(ALL_RED_TRANSITION)
 
-                # East & West Green, North & South Red
-                GPIO.output(RED_EW, False)
-                GPIO.output(GREEN_EW, True)
-                print(f"East & West Green light for {MIN_GREEN_TIME_EW} seconds.")
-                # time.sleep(MIN_GREEN_TIME_EW)
-                safe_sleep(MIN_GREEN_TIME_EW)
+            # East & West Green, North & South Red
+            GPIO.output(RED_EW, False)
+            GPIO.output(GREEN_EW, True)
+            print(f"East & West Green light for {MIN_GREEN_TIME_EW} seconds.")
+            # time.sleep(MIN_GREEN_TIME_EW)
+            safe_sleep(MIN_GREEN_TIME_EW)
 
-                # East & West Yellow, North & South Red
-                GPIO.output(GREEN_EW, False)
-                GPIO.output(YELLOW_EW, True)
-                print("East & West Yellow light for 10 seconds.")
-                # time.sleep(10)
-                safe_sleep(10)
+            # East & West Yellow, North & South Red
+            GPIO.output(GREEN_EW, False)
+            GPIO.output(YELLOW_EW, True)
+            print("East & West Yellow light for 10 seconds.")
+            # time.sleep(10)
+            safe_sleep(10)
 
-                # All Red for transition
-                GPIO.output(YELLOW_EW, False)
-                GPIO.output(RED_NS, True)
-                GPIO.output(RED_EW, True)
-                print(f"All Red light for {ALL_RED_TRANSITION} seconds.")
-                # time.sleep(ALL_RED_TRANSITION)
-                safe_sleep(ALL_RED_TRANSITION)
-            else:
-                GPIO.output(GREEN_NS, True)
-                GPIO.output(RED_EW, True)
-                GPIO.output(GREEN_EW, False)
-                GPIO.output(RED_NS, False)
-                if emergency_msg:
-                    print(f"Emergency activated.")
-                    emergency_msg = False
-    except KeyboardInterrupt:
-        traffic_thread.join()
-        GPIO.cleanup()
+            # All Red for transition
+            GPIO.output(YELLOW_EW, False)
+            GPIO.output(RED_NS, True)
+            GPIO.output(RED_EW, True)
+            print(f"All Red light for {ALL_RED_TRANSITION} seconds.")
+            # time.sleep(ALL_RED_TRANSITION)
+            safe_sleep(ALL_RED_TRANSITION)
+        else:
+            GPIO.output(GREEN_NS, True)
+            GPIO.output(RED_EW, True)
+            GPIO.output(GREEN_EW, False)
+            GPIO.output(RED_NS, False)
+            if emergency_msg:
+                print(f"Emergency activated.")
+                emergency_msg = False
                 
 
 # Create threads to modify our code sequence
-traffic_thread = threading.Thread(target=traffic_light_logic)
-traffic_thread.start()
+# traffic_thread = threading.Thread(target=traffic_light_logic)
+# traffic_thread.start()
     
 # Main loop
-try:
-    while True:
-        try:
-            blynk.run()
-        except KeyboardInterrupt:
-            break
-finally:
-    traffic_thread.join()
-    GPIO.cleanup()
+while True:
+    try:
+        traffic_light_logic()
+    except KeyboardInterrupt:
+        GPIO.cleanup()
+        break
+
+# try:
+#     while True:
+#         try:
+#             blynk.run()
+#         except KeyboardInterrupt:
+#             break
+# finally:
+#     traffic_thread.join()
+#     GPIO.cleanup()
