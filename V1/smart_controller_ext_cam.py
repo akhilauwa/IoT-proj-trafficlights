@@ -4,7 +4,6 @@ Communications (Blynk, socket) written by: Akhila Liyanage
 Traffic lights logic written by Chen Shen and Shijun Shao
 '''
 
-# pip install blynk-library-python
 import threading
 import BlynkLib
 import random
@@ -56,14 +55,14 @@ def v0_write_handler(value):
     if value == ['1']:
         # TODO change traffic_light_sequence to read emergency flag
         emergency_activated = True
-        blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Activated\n')
-        print('Emergency Vehicle Override Activated')
+        blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Activated.\n')
+        print('Emergency Vehicle Override Activated.')
     else:
         # TODO change traffic_light_sequence to read emergency flag
         emergency_activated = False
-        blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Deactivated\n')
-        print('Emergency Vehicle Override Deactivated')
-        print('Resuming Normal Sequence')
+        blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Deactivated.\n')
+        print('Emergency Vehicle Override Deactivated.')
+        print('Resuming Normal Sequence.')
 
 # Get car count using YOLO
 def get_NS_car_count(duration=20):
@@ -80,12 +79,13 @@ def get_NS_car_count(duration=20):
         # Receive car count from the server
         response = client_socket.recv(1024)  # Receive up to 1024 bytes
         car_count = int(response.decode('utf-8'))
-        print(f"Car count: {car_count}")
+        print(f"Car count: {car_count}.")
 
         print("Closing client socket...")
         client_socket.close()
         print("Client socket closed.")
     except KeyboardInterrupt:
+        print("KeyboardInterrupt registered.")
         print("Closing client socket...")
         client_socket.close()
         print("Client socket closed.")
@@ -110,7 +110,8 @@ def safe_sleep(seconds):
                 break
             time.sleep(0.1)
     except KeyboardInterrupt:
-        print("Exiting sleep")
+        print("KeyboardInterrupt registered.")
+        print("Exiting sleep.")
 
 # Traffic light logic (main)       
 def traffic_light_logic():
@@ -121,6 +122,7 @@ def traffic_light_logic():
     try:
         while True:
             if not emergency_activated:
+                print("----------- Start of Sequence ----------- \n")
                 emergency_msg = True
                 green_time_ns = MIN_GREEN_TIME_NS + car_count * TIME_PER_CAR
                 
@@ -178,14 +180,14 @@ def traffic_light_logic():
                 GPIO.output(GREEN_EW, False)
                 GPIO.output(RED_NS, False)
                 if emergency_msg:
-                    print(f"Emergency activated.")
+                    print("Emergency activated.")
                     emergency_msg = False
     except KeyboardInterrupt:
         traffic_thread.join()
         GPIO.cleanup()
                 
 
-# Create threads to modify our code sequence
+# Run traffic_light_logic in the background
 traffic_thread = threading.Thread(target=traffic_light_logic)
 traffic_thread.start()
     
@@ -194,5 +196,6 @@ while True:
     try:
         blynk.run()
     except KeyboardInterrupt:
+        print("KeyboardInterrupt registered.")
         traffic_thread.join()
         GPIO.cleanup()
