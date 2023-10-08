@@ -104,10 +104,13 @@ def turn_off_all_lights():
 # Safe sleep to check for emergency override
 def safe_sleep(seconds):
     end_time = time.time() + seconds
-    while time.time() < end_time:
-        if emergency_activated:
-            break
-        time.sleep(0.1)
+    try:
+        while time.time() < end_time:
+            if emergency_activated:
+                break
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        print("Exiting sleep")
 
 # Traffic light logic (main)       
 def traffic_light_logic():
