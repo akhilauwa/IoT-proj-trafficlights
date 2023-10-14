@@ -27,10 +27,11 @@ YELLOW_EW = 24
 RED_NS = 17
 RED_EW = 23
 
-MIN_GREEN_TIME_NS = 10  # Minimum green light time in seconds for North & South
-TIME_PER_CAR = 3       # Additional green light time in seconds per car
-MIN_GREEN_TIME_EW = 6  # Fixed green light time in seconds for East & West
+MIN_GREEN_TIME_NS = 15  # Minimum green light time in seconds for North & South
+TIME_PER_CAR = 2       # Additional green light time in seconds per car
+MIN_GREEN_TIME_EW = 3  # Fixed green light time in seconds for East & West
 ALL_RED_TRANSITION = 3  # All Red light duration for transitions
+YELLOW_TIME = 1
 
 ALL_LEDS = [GREEN_NS, GREEN_EW, YELLOW_NS, YELLOW_EW, RED_NS, RED_EW]
 
@@ -157,7 +158,7 @@ def traffic_light_logic():
                 change_light_state(False, True, False, False, False, True)
                 print("North & South Yellow light for 10 seconds.")
                 # time.sleep(10)
-                safe_sleep(10)
+                safe_sleep(YELLOW_TIME)
                 
                 # All Red for transition
                 change_light_state(False, False, True, False, False, True)
@@ -175,7 +176,7 @@ def traffic_light_logic():
                 change_light_state(False, False, True, False, True, False)
                 print("East & West Yellow light for 10 seconds.")
                 # time.sleep(10)
-                safe_sleep(10)
+                safe_sleep(YELLOW_TIME)
 
                 # All Red for transition
                 change_light_state(False, False, True, False, False, True)
