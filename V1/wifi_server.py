@@ -22,8 +22,8 @@ server_socket.settimeout(1)
 
 def log_message(message):
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    # print(f"{current_time}   {message}")
-    print(message)
+    print(f"{current_time}   {message}")
+    # print(message)
 
 try:
     log_message(f"Listening for incoming connections on {host}:{port}")
