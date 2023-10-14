@@ -7,8 +7,12 @@ import time
 from sort import *
 import numpy as np
 
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 class TrafficCounter:
-    def __init__(self, model_path="Yolo-Weights/ToyCar.pt"):
+    def __init__(self, model_path=basedir+"/Yolo-Weights/ToyCar.pt"):
         self.model = YOLO(model_path)
         self.classNames = ["car"]
         self.tracker = Sort(max_age=20, min_hits=3, iou_threshold=0.3)
@@ -23,8 +27,8 @@ class TrafficCounter:
 
     def initialize_capture(self):
         self.cap = cv2.VideoCapture(1)
-        self.cap.set(3, 640)
-        self.cap.set(4, 360)
+        self.cap.set(3, 1280)
+        self.cap.set(4, 720)
         self.frame_width = int(self.cap.get(3))
         self.frame_height = int(self.cap.get(4))
         self.middle_y = self.frame_height // 2
