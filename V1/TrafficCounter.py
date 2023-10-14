@@ -22,7 +22,7 @@ class TrafficCounter:
         self.thread = None
 
     def initialize_capture(self):
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(1)
         self.cap.set(3, 640)
         self.cap.set(4, 360)
         self.frame_width = int(self.cap.get(3))
