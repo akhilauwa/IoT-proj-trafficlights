@@ -20,8 +20,15 @@ In the terminal type:
 ```
 sudo nano /etc/rc.local
 ```
-Before exit 0, insert:
+Before exit 0, insert (modify [USERNAME] to the RPi username):
 ```
-sudo bash ~/Documents/IoT-proj-trafficlights/start_traffic.sh &
+sudo bash /home/[USERNAME]/Documents/IoT-proj-trafficlights/start_traffic.sh &
 ```
-Note that start_traffic.sh needs to be in the IoT-proj-trafficlights directory
+Modify [USERNAME] in start_traffic.sh line 1:
+```
+cd /home/[USERNAME]/Documents/IoT-proj-trafficlights
+```
+Note that start_traffic.sh may need execute permissions, navigate to its location and type:
+```
+chmod +x start_traffic.sh
+```
