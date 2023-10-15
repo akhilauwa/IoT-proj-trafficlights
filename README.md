@@ -14,3 +14,14 @@ To deactivate the virtual environment, run the following command:
 ```
 deactivate
 ```
+
+### Running the python script at RPi Startup
+In the terminal type:
+```
+sudo nano /etc/rc.local
+```
+Before exit 0, insert:
+```
+sudo bash ~/Documents/IoT-proj-trafficlights/start_traffic.sh &
+```
+Note that start_traffic.sh needs to be in the IoT-proj-trafficlights directory
