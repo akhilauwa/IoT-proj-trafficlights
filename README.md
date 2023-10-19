@@ -1,6 +1,6 @@
 # IoT-proj-trafficlights
 
-## Running Traffic Login on Raspberry Pi
+## Running Traffic Logic on Raspberry Pi
 The Raspberry Pi must run the smart_controller.py script in the V1 folder:
 ```
 python smart_controller.py
