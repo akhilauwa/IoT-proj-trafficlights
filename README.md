@@ -1,7 +1,15 @@
 # IoT-proj-trafficlights
 
+## Running Traffic Login on Raspberry Pi
+The Raspberry Pi must run the smart_controller.py script in the V1 folder:
+```
+python smart_controller.py
+```
+
+## Running YOLO on the Server
+
 ### Virtual Environment
-It is recommended to use a virtual environment to run this project. To create a virtual environment, run the following command in the project directory:
+It is recommended to use a virtual environment to run this project on the server. To create a virtual environment, run the following command in the project directory:
 ```
 python -m venv venv
 ```
@@ -15,7 +23,12 @@ To deactivate the virtual environment, run the following command:
 deactivate
 ```
 
-### Running the python script at RPi Startup
+The server must run the wifi_server.py script in the V1 folder:
+```
+python wifi_server.py
+```
+
+## Running the python script at RPi Startup
 In the terminal type:
 ```
 sudo nano /etc/rc.local
