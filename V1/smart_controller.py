@@ -196,7 +196,7 @@ def traffic_light_logic():
                 
 
 # Run traffic_light_logic in the background
-traffic_thread = threading.Thread(target=traffic_light_logic)
+traffic_thread = threading.Thread(target=traffic_light_logic, daemon=True)
 traffic_thread.start()
     
 # Main loop
