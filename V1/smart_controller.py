@@ -39,6 +39,7 @@ cars_virt_pin = 2
 send_interval = 3
 term_virt_pin = 3
 
+# Emergency override variable.
 emergency_activated = False
 
 # Setup GPIO pins
