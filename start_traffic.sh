@@ -1,3 +1,5 @@
+# This script is run on startup of the Raspberry Pi.
+
 cd /home/[USERNAME]/Documents/IoT-proj-trafficlights
 
 source venv/bin/activate
