@@ -1,3 +1,9 @@
+'''
+This file is used to count the number of cars in a video stream
+Runs on YOLO Server
+Written by: Robbie Baiou
+'''
+
 import threading
 from ultralytics import YOLO
 import cv2

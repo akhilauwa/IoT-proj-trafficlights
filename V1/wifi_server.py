@@ -1,3 +1,9 @@
+'''
+This file is the server for the YOLO traffic counter. It listens for incoming connections from the client and sends the traffic count to the client.
+Runs on YOLO Server
+Written by: Akhila Liyanage
+'''
+
 import socket
 from datetime import datetime
 from TrafficCounter import TrafficCounter
@@ -7,7 +13,7 @@ traffic_counter = TrafficCounter()
 # Create a socket object
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Define the host and port to listen on
+# Define the host and port to listen on (change accordingly)
 host = "192.168.35.111"
 port = 9000
 
@@ -71,6 +77,7 @@ except KeyboardInterrupt:
         client_socket.close()
         log_message("Client socket closed.")
 
+# Close the server socket
 log_message("Closing server socket...")
 server_socket.close()
 log_message("Server socket closed.")

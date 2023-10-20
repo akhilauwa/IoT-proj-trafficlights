@@ -41,9 +41,6 @@ term_virt_pin = 3
 
 emergency_activated = False
 
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(17, GPIO.OUT)
-# GPIO.setup(23, GPIO.OUT)
 # Setup GPIO pins
 GPIO.setmode(GPIO.BCM)
 for pin in ALL_LEDS:
@@ -57,12 +54,10 @@ terminate_program = False
 def v0_write_handler(value):
     global emergency_activated
     if value == ['1']:
-        # TODO change traffic_light_sequence to read emergency flag
         emergency_activated = True
         blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Activated.\n')
         print('Emergency Vehicle Override Activated.')
     else:
-        # TODO change traffic_light_sequence to read emergency flag
         emergency_activated = False
         blynk.virtual_write(term_virt_pin, 'Emergency Vehicle Override Deactivated.\n')
         print('Emergency Vehicle Override Deactivated.')
@@ -95,6 +90,7 @@ def get_NS_car_count(duration=20):
         print("Client socket closed.")
 
     return car_count
+
 # Helper function to change light state
 def change_light_state(NS_green, NS_yellow, NS_red, EW_green, EW_yellow, EW_red):
     GPIO.output(GREEN_NS, NS_green)
@@ -151,8 +147,6 @@ def traffic_light_logic():
                 # NOTE calling get_NS_car_count(duration) here will cause the program to wait for the car count to finish
                 car_count = get_NS_car_count(green_time_ns)
                 send_NS_car_count(car_count)
-                # time.sleep(green_time_ns)
-                # safe_sleep(green_time_ns)
 
                 # North & South Yellow, East & West Red
                 change_light_state(False, True, False, False, False, True)
@@ -184,6 +178,7 @@ def traffic_light_logic():
                 # time.sleep(ALL_RED_TRANSITION)
                 safe_sleep(ALL_RED_TRANSITION)
             else:
+                # Emergency Vehicle Override activated
                 change_light_state(True, False, False, False, False, True)
                 if emergency_msg:
                     print("Emergency activated.")
@@ -201,14 +196,15 @@ traffic_thread.start()
     
 # Main loop
 try:
-    while not terminate_program:  # <-- Check the flag here
+    while not terminate_program:
+        # Blynk must be run in the main thread
         blynk.run()
 except KeyboardInterrupt:
     print("KeyboardInterrupt registered in main loop.")
     terminate_program = True  # Set the flag to signal all loops/threads to terminate
     traffic_thread.join()  # Wait for the traffic_light_logic thread to finish
 finally:
-    # Call GPIO.cleanup()
+    # Clean up GPIO pins on normal program termination
     GPIO.cleanup()
 
 print("Program terminated gracefully.")
